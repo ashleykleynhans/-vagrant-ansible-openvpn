@@ -1,4 +1,4 @@
- VAGRANT_IMAGE_NAME = "ubuntu/focal64"
+VAGRANT_IMAGE_NAME = "ubuntu/focal64"
 
 Vagrant.configure("2") do |config|
     config.vm.box = VAGRANT_IMAGE_NAME
@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "openvpn" do |openvpn|
         openvpn.vm.provider "virtualbox" do |vb|
             vb.name = "openvpn"
-            vb.memory = 256
+            vb.memory = 512
             vb.cpus = 1
         end
         openvpn.vm.hostname = "openvpn"
