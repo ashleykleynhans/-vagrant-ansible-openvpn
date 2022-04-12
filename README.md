@@ -1,6 +1,6 @@
 # vagrant-ansible-openvpn
 
-Provision OpenVPN using Vagrant, Virtualbox and Ansible,
+Provision OpenVPN using Vagrant, Virtualbox and Ansible.
 
 ## Requirements
 
