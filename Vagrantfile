@@ -13,11 +13,11 @@ Vagrant.configure("2") do |config|
             vb.cpus = 1
         end
         openvpn.vm.hostname = "openvpn"
-        openvpn.vm.network :private_network, ip: "10.10.10.10"
+        openvpn.vm.network :private_network, ip: "172.31.42.100"
         openvpn.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/playbooks/openvpn.yml"
             ansible.extra_vars = {
-                node_ip: "10.10.10.10",
+                node_ip: "172.31.42.100",
             }
         end
     end

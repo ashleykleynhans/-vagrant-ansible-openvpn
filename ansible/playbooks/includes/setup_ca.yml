@@ -1,0 +1,88 @@
+---
+- name: Create OpenVPN keys directory
+  ansible.builtin.file:
+    path: /etc/openvpn/keys
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Copy OpenSSL CA extension
+  ansible.builtin.copy:
+    src: ../files/openssl-ca.ext
+    dest: "{{ openvpn_cert_path }}"
+    owner: root
+    group: root
+    mode: 0400
+
+- name: Generate CA key
+  ansible.builtin.command: >-
+    openssl req -nodes -newkey rsa:{{ openvpn_rsa_bits }} -keyout ca-key.pem -out ca-csr.pem
+    -days 3650 -subj /CN=OpenVPN-CA-{{ inventory_hostname[:53] }}/
+  args:
+    chdir: "{{ openvpn_cert_path }}"
+    creates: ca-key.pem
+
+- name: Sign CA key
+  ansible.builtin.command: >-
+    openssl x509 -req -in ca-csr.pem -out ca.crt -CAcreateserial
+    -signkey ca-key.pem -sha256 -days 3650 -extfile openssl-ca.ext
+  args:
+    chdir: "{{ openvpn_cert_path }}"
+    creates: ca.crt
+
+- name: Install ca.conf config file
+  ansible.builtin.template:
+    src: ../templates/ca.conf.j2
+    dest: "{{ openvpn_cert_path }}/ca.conf"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Create initial certificate revocation list squence number
+  ansible.builtin.shell: "echo 00 > crl_number"
+  args:
+    chdir: "{{ openvpn_cert_path }}"
+    creates: crl_number
+
+- name: Install revocation script
+  ansible.builtin.template:
+    src: ../templates/revoke.sh.j2
+    dest: "{{ openvpn_cert_path }}/revoke.sh"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Check whether certificate revocation list database exists
+  ansible.builtin.stat:
+    path: "{{ openvpn_cert_path }}/index.txt"
+  register: file_result
+
+- name: Create certificate revocation list database if required
+  ansible.builtin.file:
+    path: "{{ openvpn_cert_path }}/index.txt"
+    state: touch
+    mode: 0600
+  when: not file_result.stat.exists
+
+- name: Set up certificate revocation list
+  ansible.builtin.command: ./revoke.sh
+  args:
+    chdir: "{{ openvpn_cert_path }}"
+    creates: "{{ openvpn_cert_path }}/ca-crl.pem"
+
+- name: Install certificate revocation cron script
+  ansible.builtin.template:
+    src: ../templates/crl-cron.sh.j2
+    dest: "{{ openvpn_base_path }}/crl-cron.sh"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Add cron job to check every Saturday if the CRL needs to be renewed
+  ansible.builtin.cron:
+    name: "Check whether CRL will expire soon"
+    special_time: weekly
+    job: "sh {{ openvpn_base_path }}/crl-cron.sh"
+    cron_file: /etc/cron.d/openvpn-crl
+    user: root

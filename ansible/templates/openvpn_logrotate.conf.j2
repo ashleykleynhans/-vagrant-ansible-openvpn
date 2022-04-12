@@ -1,0 +1,11 @@
+## {{ ansible_managed }}
+
+/var/log/openvpn/openvpn.log {
+  rotate 4
+  weekly
+  missingok
+  notifempty
+  sharedscripts
+  copytruncate
+  delaycompress
+}

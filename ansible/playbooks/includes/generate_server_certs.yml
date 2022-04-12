@@ -1,0 +1,34 @@
+---
+- name: Copy OpenSSL server extension
+  ansible.builtin.copy:
+    src: ../files/openssl-server.ext
+    dest: "{{ openvpn_cert_path }}"
+    owner: root
+    group: root
+    mode: 0400
+
+- name: Generate server key
+  command: >-
+    openssl req -nodes -newkey rsa:{{ openvpn_rsa_bits }}
+    -keyout ../server/server.key -out ../server/server.csr
+    -days 3650 -subj /CN=OpenVPN-Server-{{ inventory_hostname[:49] }}/
+  args:
+    chdir: "{{ openvpn_cert_path }}"
+    creates:
+      - server.key
+      - server.csr
+
+- name: Sign server key
+  ansible.builtin.command: >-
+    openssl x509 -req -in ../server/server.csr
+    -out ../server/server.crt -CA ca.crt -CAkey ca-key.pem
+    -sha256 -days 3650 -CAcreateserial -extfile openssl-server.ext
+  args:
+    chdir: "{{ openvpn_cert_path }}"
+    creates: server.crt
+
+
+
+
+
+

@@ -9,44 +9,24 @@
     - name: Include task to install useful packages
       ansible.builtin.include_tasks: includes/install_useful_packages.yml
 
-    - name: Install OpenVPN and Easy-RSA
+    - name: Install OpenVPN
       ansible.builtin.apt:
-        name: "{{ packages }}"
+        name: openvpn
         state: present
         update_cache: yes
       vars:
         packages:
           - openvpn
-          - easy-rsa
 
-    - name: Create /home/ubuntu/easy-rsa directory
-      ansible.builtin.file:
-        path:  /home/ubuntu/easy-rsa
-        state: directory
-        mode: 0700
-        owner: ubuntu
-        group: ubuntu
+    - name: Include task to generate CA certs
+      ansible.builtin.include_tasks: includes/setup_ca.yml
 
-    - name: Symlink easy-rsa files
-      ansible.builtin.file:
-        src: "/usr/share/easy-rsa/{{ item }}"
-        dest: "/home/ubuntu/easy-rsa/{{ item }}"
-        state: link
-        mode: 0700
-        owner: ubuntu
-        group: ubuntu
-      loop:
-        - easyrsa
-        - openssl-easyrsa.cnf
-        - x509-types
+    - name: Setup OpenVPN server
+      ansible.builtin.include_tasks: includes/setup_server.yml
 
-    - name: Copy easy-rsa vars file
-      ansible.builtin.copy:
-        src: ../files/vars
-        dest: /home/ubuntu/easy-rsa/vars
-        owner: ubuntu
-        group: ubuntu
-        mode: 0700
-
-    - name: Initialise Easy-RSA PKI
-      ansible.builtin.shell: /home/ubuntu/easy-rsa/easyrsa init-pki
+  handlers:
+    - name: restart openvpn
+      service:
+        name: openvpn-server@server.service
+        enabled: true
+        state: restarted

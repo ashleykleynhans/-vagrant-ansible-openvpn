@@ -1,0 +1,9 @@
+#!/bin/sh
+# {{ ansible_managed }}
+
+nextUpdate=$(date --date "$(openssl crl -in {{ openvpn_cert_path }}/ca-crl.pem -noout -nextupdate | cut -d'=' -f2)" +%s)
+now=$(date +%s)
+
+if [ $(( (nextUpdate - now) / 86400 )) -le 10 ]; then
+    sh {{ openvpn_cert_path }}/revoke.sh
+fi

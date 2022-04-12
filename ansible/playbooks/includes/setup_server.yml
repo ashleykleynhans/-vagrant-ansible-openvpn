@@ -1,0 +1,51 @@
+---
+- name: Include task to generate server certs
+  ansible.builtin.include_tasks: includes/generate_server_certs.yml
+
+- name: Generate DH params
+  ansible.builtin.command: >-
+    openssl dhparam -out {{ openvpn_server_path }}/dh.pem {{ openvpn_rsa_bits }}
+  args:
+    chdir: "{{ openvpn_cert_path }}"
+    creates: dh.pem
+
+- name: Generate tls-auth key
+  ansible.builtin.command: openvpn --genkey --secret ta.key
+  args:
+    chdir: "{{ openvpn_server_path }}"
+    creates: ta.key
+
+- name: Enable ipv4 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    ignoreerrors: true
+  failed_when: false
+
+- name: Copy openvpn logrotate config file
+  ansible.builtin.template:
+    src: ../templates/openvpn_logrotate.conf.j2
+    dest: /etc/logrotate.d/openvpn.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create openvpn config file
+  ansible.builtin.template:
+    src: ../templates/server.conf.j2
+    dest: "{{ openvpn_server_path }}/openvpn.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart openvpn
+
+- name: Copy systemd unit file
+  ansible.builtin.copy:
+    src: ../files/openvpn-server@.service
+    dest: /usr/lib/systemd/system/openvpn-server@.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart openvpn
