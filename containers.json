@@ -1,0 +1,9 @@
+[
+  {
+    "Description": "OpenVPN 2.4.7 on Ubuntu 20.04 LTS",
+    "Format": "ova",
+    "UserBucket": {
+        "S3Bucket": "YOUR-BUCKET-NAME",
+        "S3Key": "openvpn.ova"
+    }
+}]

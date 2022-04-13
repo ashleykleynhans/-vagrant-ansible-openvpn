@@ -1,24 +1,17 @@
-VAGRANT_IMAGE_NAME = "ubuntu/focal64"
+# The official Ubuntu image ubuntu/focal64 has initramfs/initrd issues
+# when importing the OVA as am AMI into AWS, geerlingguy/ubuntu2004 image
+# does not have any of those issues.
+VAGRANT_IMAGE_NAME = "geerlingguy/ubuntu2004"
 
 Vagrant.configure("2") do |config|
     config.vm.box = VAGRANT_IMAGE_NAME
     config.vm.box_check_update = false
     config.ssh.insert_key = false
 
-    # Provision OpenVPN
     config.vm.define "openvpn" do |openvpn|
-        openvpn.vm.provider "virtualbox" do |vb|
-            vb.name = "openvpn"
-            vb.memory = 512
-            vb.cpus = 1
-        end
         openvpn.vm.hostname = "openvpn"
-        openvpn.vm.network :private_network, ip: "172.31.42.100"
         openvpn.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/playbooks/openvpn.yml"
-            ansible.extra_vars = {
-                node_ip: "172.31.42.100",
-            }
         end
     end
 end
