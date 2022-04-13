@@ -18,13 +18,11 @@ tls-cipher TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384:TLS-ECDHE-RSA-WITH-AES-256-GC
 server {{ openvpn_network }} {{ openvpn_netmask }}
 ifconfig-pool-persist persist.txt
 
-push "redirect-gateway def1 bypass-dhcp"
 push "dhcp-option DNS 1.0.0.1"
 push "dhcp-option DNS 1.1.1.1"
 push "dhcp-option DNS 8.8.8.8"
 push "dhcp-option DNS 8.8.4.4"
 keepalive {{ openvpn_keepalive_ping }} {{ openvpn_keepalive_timeout }}
-compress lzo
 persist-key
 persist-tun
 user nobody
