@@ -27,6 +27,9 @@
     -s {{ openvpn_network }}/{{ openvpn_cidr }}
     -o eth0 -j MASQUERADE
 
+- name: Save IPV4 iptables rules to persist on reboot
+  ansible.builtin.shell: /sbin/iptables-save > /etc/iptables/rules.v4
+
 - name: Enable ipv4 forwarding
   ansible.posix.sysctl:
     name: net.ipv4.ip_forward
