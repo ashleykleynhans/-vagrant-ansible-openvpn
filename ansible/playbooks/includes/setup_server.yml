@@ -15,6 +15,18 @@
     chdir: "{{ openvpn_server_path }}"
     creates: ta.key
 
+- name: Install iptables-persistent to persist rules across reboots
+  ansible.builtin.apt:
+    name: iptables-persistent
+    state: present
+    update_cache: yes
+
+- name: Configure iptables to handle the NAT
+  ansible.builtin.command: >-
+    /usr/sbin/iptables -t nat -A POSTROUTING
+    -s {{ openvpn_network }}/{{ openvpn_cidr }}
+    -o eth0 -j MASQUERADE
+
 - name: Enable ipv4 forwarding
   ansible.posix.sysctl:
     name: net.ipv4.ip_forward

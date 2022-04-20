@@ -8,7 +8,10 @@ openvpn_port: 443
 openvpn_proto: udp
 openvpn_auth: SHA256
 openvpn_cipher: AES-256-GCM
-openvpn_network: 172.31.42.0
+openvpn_network: 192.168.88.0
 openvpn_netmask: 255.255.255.0
+openvpn_inet: "{{ openvpn_network }}/{{ openvpn_netmask }}"
+openvpn_cidr: "{{ openvpn_inet | ansible.netcommon.ipaddr('prefix') }}"
+openvpn_push_route: 172.31.0.0 255.255.0.0
 openvpn_keepalive_ping: 5
 openvpn_keepalive_timeout: 30
