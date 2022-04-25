@@ -16,9 +16,9 @@ brew install vagrant
 echo "Installing Ansible"
 brew install ansible
 
-# Install Python netaddr module
-echo "Installing ython netaddr module"
-pip3 install netaddr
+# Install Python requirements
+echo "Installing Python requirements"
+pip3 install -r requirements.txt
 
 # Install AWS CLI
 echo "Installing AWS CLI"
