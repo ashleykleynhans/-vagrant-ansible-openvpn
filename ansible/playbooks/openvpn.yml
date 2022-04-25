@@ -9,24 +9,18 @@
     - name: Include task to install useful packages
       ansible.builtin.include_tasks: includes/install_useful_packages.yml
 
-    - name: Install OpenVPN
-      ansible.builtin.apt:
-        name: openvpn
-        state: present
-        update_cache: yes
-      vars:
-        packages:
-          - openvpn
-
     - name: Include task to generate CA certs
       ansible.builtin.include_tasks: includes/setup_ca.yml
 
-    - name: Setup OpenVPN server
+    - name: Include task to Setup OpenVPN server
       ansible.builtin.include_tasks: includes/setup_server.yml
+
+    - name: Include task to Manage users
+      ansible.builtin.include_tasks: includes/user_management.yml
 
   handlers:
     - name: restart openvpn
-      service:
+      ansible.builtin.service:
         name: openvpn-server@server.service
         enabled: true
         state: restarted

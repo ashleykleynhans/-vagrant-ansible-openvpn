@@ -1,0 +1,23 @@
+---
+- name: Add ubuntu user
+  ansible.builtin.user:
+    name: ubuntu
+    password: "{{ openvpn_ubuntu_password | password_hash('sha512') }}"
+    shell: /bin/bash
+    expires: -1
+    groups: sudo
+
+- name: Allow sudo access for ubuntu user
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    line: "ubuntu        ALL=(ALL)       NOPASSWD: ALL"
+
+- name: Set vim as default editor across all profiles
+  ansible.builtin.copy:
+    src: ../files/editor.sh
+    dest: /etc/profile.d/editor.sh
+    owner: root
+    group: root
+    mode: 0644
+

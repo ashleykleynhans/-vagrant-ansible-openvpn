@@ -1,0 +1,22 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Disable SSH password for vagrant user
+      ansible.builtin.user:
+        name: vagrant
+        password: "!"
+
+    - name: Remove vagrant SSH key
+      ansible.builtin.file:
+        path: /home/vagrant/.ssh/authorized_keys
+        state: absent
+
+    # This task must always be last, any tasks after this
+    # will fail due to priviledge escalation issues
+    - name: Disable sudo access for vagrant user
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: absent
+        line: "vagrant        ALL=(ALL)       NOPASSWD: ALL"

@@ -1,4 +1,6 @@
 ---
+openvpn_ubuntu_password: ubuntu
+
 openvpn_base_path: /etc/openvpn
 openvpn_cert_path: "{{ openvpn_base_path }}/keys"
 openvpn_server_path: "{{ openvpn_base_path }}/server"

@@ -1,6 +1,6 @@
 # vagrant-ansible-openvpn
 
-Provision OpenVPN using Vagrant, Virtualbox and Ansible.
+Provision OpenVPN on Ubuntu 22.04 LTS using Vagrant, Virtualbox and Ansible.
 
 ## Clone the GitHub Repository
 

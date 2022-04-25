@@ -1,4 +1,13 @@
 ---
+- name: Install OpenVPN
+  ansible.builtin.apt:
+    name: openvpn
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - openvpn
+
 - name: Include task to generate server certs
   ansible.builtin.include_tasks: includes/generate_server_certs.yml
 
