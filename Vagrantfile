@@ -1,4 +1,4 @@
-VAGRANT_IMAGE_NAME = "ashleykza/jammy64"
+VAGRANT_IMAGE_NAME = "ashleykleynhans/jammy64"
 
 VAGRANT_COMMAND = ARGV[0]
 
