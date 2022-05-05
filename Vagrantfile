@@ -14,9 +14,11 @@ Vagrant.configure("2") do |config|
     config.vm.define "openvpn" do |openvpn|
         openvpn.vm.hostname = "openvpn"
         openvpn.vm.provision "ansible" do |ansible|
+            ansible.compatibility_mode = "2.0"
             ansible.playbook = "ansible/playbooks/openvpn.yml"
         end
 #        openvpn.vm.provision "ansible" do |ansible|
+#            ansible.compatibility_mode = "2.0"
 #            ansible.playbook = "ansible/playbooks/disable_vagrant_user.yml"
 #        end
     end
